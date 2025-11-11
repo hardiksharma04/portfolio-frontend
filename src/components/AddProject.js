@@ -1,11 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 
+// API_URL points to your live Render backend
+const API_URL = "https://portfolio-backend-7ine.onrender.com/";
+
 export default function AddProject({ onProjectAdded }) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    link: ""
+    link: "",
   });
 
   const handleChange = (e) => {
@@ -13,17 +16,25 @@ export default function AddProject({ onProjectAdded }) {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    await axios.post("http://127.0.0.1:5000/add_project", formData);
-    alert("✅ Project added successfully!");
-    setFormData({ title: "", description: "", link: "" });
-    if (onProjectAdded) onProjectAdded(); // refresh project list
-  } catch (error) {
-    console.error(error);
-    alert("❌ Failed to add project");
-  }
-};
+    e.preventDefault();
+    try {
+      // 🔍 Debugging: Log what’s being sent
+      console.log("Sending data to:", `${API_URL}/add_project`, formData);
+
+      // POST to the correct endpoint
+      await axios.post(`${API_URL}/add_project`, formData, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      alert("✅ Project added successfully!");
+      setFormData({ title: "", description: "", link: "" });
+
+      if (onProjectAdded) onProjectAdded(); // refresh project list
+    } catch (error) {
+      console.error("Error adding project:", error.response?.data || error.message);
+      alert("❌ Failed to add project. Check console for details.");
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 bg-white rounded-xl shadow">
